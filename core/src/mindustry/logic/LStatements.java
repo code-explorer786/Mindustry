@@ -1423,6 +1423,9 @@ public class LStatements{
                     fields(table, x, str -> x = str);
                     table.add(" y ");
                     fields(table, y, str -> y = str);
+                    table.add(" for ");
+                    fields(table, duration, str -> duration = str);
+                    table.add(" secs ");
                 }
                 case announce, toast -> {
                     table.add(" for ");
