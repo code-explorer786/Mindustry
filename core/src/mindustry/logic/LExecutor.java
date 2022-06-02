@@ -1469,11 +1469,13 @@ public class LExecutor{
 
     public static class FlushMessageI implements LInstruction{
         public MessageType type = MessageType.announce;
-        public int duration;
+        public int x, y, duration;
 
-        public FlushMessageI(MessageType type, int duration){
+        public FlushMessageI(MessageType type, int duration, int x, int y){
             this.type = type;
             this.duration = duration;
+            this.x = x;
+            this.y = y;
         }
 
         public FlushMessageI(){
@@ -1506,6 +1508,7 @@ public class LExecutor{
                 case notify -> ui.hudfrag.showToast(Icon.info, text);
                 case announce -> ui.announce(text, exec.numf(duration));
                 case toast -> ui.showInfoToast(text, exec.numf(duration));
+                case label -> ui.showLabel(text, exec.numf(duration), exec.numf(x) * tilesize, exec.numf(y) * tilesize);
                 //TODO desync?
                 case mission -> state.rules.mission = text;
             }
