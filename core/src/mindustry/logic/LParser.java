@@ -55,7 +55,6 @@ public class LParser{
                         // unicode
                         try{
                             result += (char) Integer.parseInt(""+chars[++pos] + chars[++pos] + chars[++pos] + chars[++pos],16);
-                            pos++;
                         }catch(Exception err){}
                         break;
                     default:
@@ -79,6 +78,7 @@ public class LParser{
 
         if(pos >= chars.length || chars[pos] != '"') error("Missing closing quote \" before end of file.");
 
+        pos++;
         return result;
     }
 
