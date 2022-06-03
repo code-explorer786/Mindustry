@@ -79,7 +79,7 @@ public class LParser{
 
         if(pos >= chars.length || chars[pos] != '"') error("Missing closing quote \" before end of file.");
 
-        return new String(chars, from, ++pos - from);
+        return result;
     }
 
     String token(){
