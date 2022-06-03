@@ -36,14 +36,44 @@ public class LParser{
     }
 
     String string(){
+        String result = "";
+        boolean escaped = false;
         int from = pos;
 
         while(++pos < chars.length){
             var c = chars[pos];
+
+            // Note that I'm sourcemodding.
+            if(escaped){
+                switch(c){
+                    case '\n':
+                    case '"':
+                    case '\\':
+                        result += c;
+                        break;
+                    case 'u':
+                        // unicode
+                        try{
+                            result += (char) Integer.parseInt(""+chars[++pos] + chars[++pos] + chars[++pos] + chars[++pos],16);
+                            pos++;
+                        }catch(Exception err){}
+                        break;
+                    default:
+                        result += "\\";
+                        result += c;
+                }
+                escaped = false;
+                continue;
+            }
+
             if(c == '\n'){
                 error("Missing closing quote \" before end of line.");
             }else if(c == '"'){
                 break;
+            }else if(c == '\\'){
+                escaped = true;
+            }else{
+                result += c;
             }
         }
 
