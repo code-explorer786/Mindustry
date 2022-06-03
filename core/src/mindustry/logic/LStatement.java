@@ -66,10 +66,21 @@ public abstract class LStatement{
         }else{
             StringBuilder res = new StringBuilder(value.length());
             if(value.charAt(0) == '"' && value.charAt(value.length() - 1) == '"'){
+                boolean escaped = false;
+
                 res.append('\"');
-                //strip out extra quotes
+                //strip out extra quotes, unless escaped
                 for(int i = 1; i < value.length() - 1; i++){
-                    if(value.charAt(i) == '"'){
+                    if(escaped){
+                        res.append('\\');
+                        res.append(value.charAt(i));
+                        escaped = false;
+                        continue;
+                    }
+
+                    if(value.charAt(i) == '\\'){
+                        escaped = true;
+                    }else if(value.charAt(i) == '"'){
                         res.append('\'');
                     }else{
                         res.append(value.charAt(i));
