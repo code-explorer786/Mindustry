@@ -1419,10 +1419,12 @@ public class LStatements{
 
             switch(type){
                 case label -> {
+                    row(table);
                     table.add(" x ");
                     fields(table, x, str -> x = str);
                     table.add(" y ");
                     fields(table, y, str -> y = str);
+                    row(table);
                     table.add(" for ");
                     fields(table, duration, str -> duration = str);
                     table.add(" secs ");
