@@ -43,12 +43,12 @@ public class LAssembler{
                     case 'x':
                         try{
                         out += (char) Integer.parseInt("" + chars[++p] + chars[++p], 16);
-                        }catch(){}
+                        }catch(Exception e){}
                         break;
                     case 'u':
                         try{
                         out += (char) Integer.parseInt("" + chars[++p] + chars[++p] + chars[++p] + chars[++p], 16);
-                        }catch(){}
+                        }catch(Exception e){}
                         break;
                     case '\\':
                     case '\n':
