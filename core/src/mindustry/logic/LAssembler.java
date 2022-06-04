@@ -68,6 +68,7 @@ public class LAssembler{
             }
             out += c;
         }
+        return out;
     }
 
     public static LAssembler assemble(String data, boolean privileged){
