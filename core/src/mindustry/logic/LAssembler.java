@@ -29,6 +29,47 @@ public class LAssembler{
         putConst("@this", null);
     }
 
+    public static String parseStr(String str){
+        char[] chars = str.toCharArray();
+        String out = "";
+        boolean escaped = false;
+        int p = -1;
+        
+        //NOTE Calling str.length() every time can decrease performance
+        while(++p < chars.length){
+            char c = chars[p];
+            if(escaped){
+                switch(c){
+                    case 'x':
+                        try{
+                        out += (char) Integer.parseInt("" + chars[++p] + chars[++p], 16);
+                        }catch(){}
+                        break;
+                    case 'u':
+                        try{
+                        out += (char) Integer.parseInt("" + chars[++p] + chars[++p] + chars[++p] + chars[++p], 16);
+                        }catch(){}
+                        break;
+                    case '\\':
+                    case '\n':
+                    case '"':
+                        out += c;
+                        break;
+                    default:
+                        out += '\\';
+                        out += c;
+                }
+                escaped = false;
+                continue;
+            }
+            if(c == '\\'){
+                escaped = true;
+                continue;
+            }
+            out += c;
+        }
+    }
+
     public static LAssembler assemble(String data, boolean privileged){
         LAssembler asm = new LAssembler();
 
@@ -68,7 +109,7 @@ public class LAssembler{
 
         //string case
         if(!symbol.isEmpty() && symbol.charAt(0) == '\"' && symbol.charAt(symbol.length() - 1) == '\"'){
-            return putConst("___" + symbol, symbol.substring(1, symbol.length() - 1).replace("\\n", "\n")).id;
+            return putConst("___" + symbol, parseStr(symbol.substring(1, symbol.length() - 1))).id;
         }
 
         //remove spaces for non-strings
