@@ -54,8 +54,7 @@ public class Links{
             this.description = Core.bundle.get("link." + name + ".description", "");
             this.link = link;
             this.icon = icon;
-            this.title = Core.bundle.get("link." + name + ".title", Strings.capitalize(name.replace("-", " ")));
-            this.title += fork ? " (code-explorer786)" : " (Anuken)";
+            this.title = Core.bundle.get("link." + name + ".title", Strings.capitalize(name.replace("-", " "))) + (fork ? " (code-explorer786)" : " (Anuken)");
         }
         public LinkEntry(String name, String link, Drawable icon, Color color){
             this(name, link, icon, color, false);
