@@ -5,6 +5,7 @@ import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
 import mindustry.*;
+import mindustry.content.*;
 import mindustry.logic.LExecutor.*;
 
 /** "Compiles" a sequence of statements into instructions. */
@@ -35,11 +36,21 @@ public class LAssembler{
         boolean escaped = false;
         int p = -1;
         
-        //NOTE Calling str.length() every time can decrease performance
         while(++p < chars.length){
             char c = chars[p];
             if(escaped){
                 switch(c){
+                    case 'n':
+                        out += '\n';
+                        break;
+                    case 't':
+                        out += '\t';
+                        break;
+                    case 'r':
+                        out += "[#"+Color.rand()+"]";
+                        out += Mathf.chance(0.05) ? "frog" : Blocks.router.emoji();
+                        out += "[]";
+                        break;
                     case 'x':
                         try{
                         out += (char) Integer.parseInt("" + chars[++p] + chars[++p], 16);
