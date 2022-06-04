@@ -4,6 +4,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
+import arc.math.1;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.logic.LExecutor.*;
@@ -47,7 +48,7 @@ public class LAssembler{
                         out += '\t';
                         break;
                     case 'r':
-                        out += "[#"+Color.rand()+"]";
+                        out += "[#"+(new Color().rand())+"]";
                         out += Mathf.chance(0.05) ? "frog" : Blocks.router.emoji();
                         out += "[]";
                         break;
