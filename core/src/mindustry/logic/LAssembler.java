@@ -4,7 +4,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.struct.*;
 import arc.util.*;
-import arc.math.1;
+import arc.math.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.logic.LExecutor.*;
