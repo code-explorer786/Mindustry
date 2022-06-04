@@ -36,31 +36,13 @@ public class LParser{
     }
 
     String string(){
-        String result = "";
         boolean escaped = false;
         int from = pos;
 
         while(++pos < chars.length){
             var c = chars[pos];
 
-            // Note that I'm sourcemodding.
             if(escaped){
-                switch(c){
-                    case '\n':
-                    case '"':
-                    case '\\':
-                        result += c;
-                        break;
-                    case 'u':
-                        // unicode
-                        try{
-                            result += (char) Integer.parseInt(""+chars[++pos] + chars[++pos] + chars[++pos] + chars[++pos],16);
-                        }catch(Exception err){}
-                        break;
-                    default:
-                        result += "\\";
-                        result += c;
-                }
                 escaped = false;
                 continue;
             }
@@ -71,15 +53,13 @@ public class LParser{
                 break;
             }else if(c == '\\'){
                 escaped = true;
-            }else{
-                result += c;
             }
         }
 
         if(pos >= chars.length || chars[pos] != '"') error("Missing closing quote \" before end of file.");
 
         pos++;
-        return result;
+        return new String(chars, from, ++pos - from);
     }
 
     String token(){
