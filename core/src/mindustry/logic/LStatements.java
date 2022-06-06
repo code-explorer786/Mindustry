@@ -1396,10 +1396,10 @@ public class LStatements{
 
     @RegisterStatement("message")
     public static class FlushMessageStatement extends LStatement{
-        public String x = "100";
-        public String y = "200";
         public MessageType type = MessageType.announce;
         public String duration = "3";
+        public String x = "100";
+        public String y = "200";
 
         @Override
         public void build(Table table){
