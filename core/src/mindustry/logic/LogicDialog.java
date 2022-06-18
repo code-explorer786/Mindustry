@@ -156,21 +156,46 @@ public class LogicDialog extends BaseDialog{
             BaseDialog dialog = new BaseDialog("@add");
             dialog.cont.pane(t -> {
                 t.background(Tex.button);
+
+                TextButtonStyle style = new TextButtonStyle(Styles.flatt);
+                style.font = Fonts.outline;
+
+                Seq<LStatement> statements = new Seq<>();
+                Color c = LogicIO.allStatements[0].get().color();
                 int i = 0;
+                int j = 0;
                 for(Prov<LStatement> prov : LogicIO.allStatements){
                     LStatement example = prov.get();
                     if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged)) continue;
 
-                    TextButtonStyle style = new TextButtonStyle(Styles.flatt);
-                    style.fontColor = example.color();
-                    style.font = Fonts.outline;
+                    // wacky method to avoid copy-pasting lines 175 - 189
+                    if(example.color() != c || ++j == LogicIO.allStatements.length){
+                        if(j == LogicIO.allStatements.length){
+                            statements.add(example);
+                            c = example.color();
+                        }
 
-                    t.button(example.name(), style, () -> {
-                        canvas.add(prov.get());
-                        dialog.hide();
-                    }).size(130f, 50f).self(c -> tooltip(c, "lst." + example.name()));
-                    if(++i % 3 == 0) t.row();
+                        t.table(table -> {
+                            table.setBackground(Tex.whiteui);
+                            table.setColor(Pal.darkerGray);
+
+                            style.fontColor = c;
+
+                            i = 0;
+                            statements.each(s -> {
+                                table.button(s.name(), style, () -> {
+                                    canvas.add(prov.get());
+                                    dialog.hide();
+                                }).size(130f, 50f).self(c -> tooltip(c, "lst." + s.name()));
+                                if(++i % 3 == 0) table.row();
+                            });
+                        }).pad(10);
+                    }
+                    t.row();
+                    c = example.color();
+                    statements.clear();
                 }
+                statements.add(example);
             });
             dialog.addCloseButton();
             dialog.show();
