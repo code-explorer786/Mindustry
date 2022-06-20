@@ -6,6 +6,7 @@ import arc.graphics.*;
 import arc.scene.actions.*;
 import arc.scene.ui.*;
 import arc.scene.ui.TextButton.*;
+import arc.scene.ui.layout.*;
 import arc.util.*;
 import mindustry.core.GameState.*;
 import mindustry.ctype.*;
@@ -154,52 +155,49 @@ public class LogicDialog extends BaseDialog{
 
         buttons.button("@add", Icon.add, () -> {
             BaseDialog dialog = new BaseDialog("@add");
-            dialog.cont.pane(t -> {
-                t.background(Tex.button);
+            dialog.cont.table(table -> {
+                table.background(Tex.button);
+                table.pane(t -> {
+                    for(Prov<LStatement> prov : LogicIO.allStatements){
+                        LStatement example = prov.get();
+                        if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged)) continue;
 
-                TextButtonStyle style = new TextButtonStyle(Styles.flatt);
-                style.font = Fonts.outline;
+                        LCategory category = example.category();
+                        Table cat = t.find(category.name);
+                        if(cat == null){
+                            t.table(s -> {
+                                if(category.icon != null){
+                                    s.image(category.icon, Pal.darkishGray).left().size(15f).padRight(10f);
+                                }
+                                s.add(category.localized()).color(Pal.darkishGray).left().tooltip(category.description());
+                                s.image(Tex.whiteui, Pal.darkishGray).left().height(5f).growX().padLeft(10f);
+                            }).growX().pad(5f).padTop(10f);
 
-                Seq<LStatement> statements = new Seq<>();
-                Color c = LogicIO.allStatements[0].get().color();
-                int i = 0;
-                int j = 0;
-                for(Prov<LStatement> prov : LogicIO.allStatements){
-                    LStatement example = prov.get();
-                    if(example instanceof InvalidStatement || example.hidden() || (example.privileged() && !privileged) || (example.nonPrivileged() && privileged)) continue;
+                            t.row();
 
-                    // wacky method to avoid copy-pasting lines 175 - 189
-                    if(example.color() != c || ++j == LogicIO.allStatements.length){
-                        if(j == LogicIO.allStatements.length){
-                            statements.add(example);
-                            c = example.color();
+                            cat = t.table(c -> {
+                                c.top().left();
+                            }).name(category.name).top().left().growX().fillY().get();
+                            t.row();
                         }
 
-                        t.table(table -> {
-                            table.setBackground(Tex.whiteui);
-                            table.setColor(Pal.darkerGray);
+                        TextButtonStyle style = new TextButtonStyle(Styles.flatt);
+                        style.fontColor = category.color;
+                        style.font = Fonts.outline;
 
-                            style.fontColor = c;
+                        cat.button(example.name(), style, () -> {
+                            canvas.add(prov.get());
+                            dialog.hide();
+                        }).size(130f, 50f).self(c -> tooltip(c, "lst." + example.name())).top().left();
 
-                            i = 0;
-                            statements.each(s -> {
-                                table.button(s.name(), style, () -> {
-                                    canvas.add(prov.get());
-                                    dialog.hide();
-                                }).size(130f, 50f).self(c -> tooltip(c, "lst." + s.name()));
-                                if(++i % 3 == 0) table.row();
-                            });
-                        }).pad(10);
+                        if(cat.getChildren().size % 3 == 0) cat.row();
                     }
-                    t.row();
-                    c = example.color();
-                    statements.clear();
-                }
-                statements.add(example);
-            });
+                }).grow();
+            }).fill().maxHeight(Core.graphics.getHeight() * 0.8f);
             dialog.addCloseButton();
             dialog.show();
         }).disabled(t -> canvas.statements.getChildren().size >= LExecutor.maxInstructions);
+
 
         add(canvas).grow().name("canvas");
 
