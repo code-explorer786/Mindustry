@@ -22,7 +22,7 @@ import static arc.Core.*;
 import static mindustry.Vars.*;
 
 public class ChatFragment extends Table{
-    private static final int messagesShown = 10;
+    private static final int messagesShown = 30;
     private Seq<String> messages = new Seq<>();
     private float fadetime;
     private boolean shown = false;
