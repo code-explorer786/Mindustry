@@ -1435,7 +1435,7 @@ public class LStatements{
 
         @Override
         public LInstruction build(LAssembler builder){
-            return new FlushMessageI(type, builder.var(duration));
+            return new FlushMessageI(type, builder.var(duration), builder.var(x), builder.var(y));
         }
 
         @Override
