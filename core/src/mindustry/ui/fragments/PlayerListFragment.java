@@ -10,6 +10,7 @@ import arc.scene.ui.ImageButton.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import arc.util.*;
+import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
 import mindustry.net.*;
@@ -111,7 +112,8 @@ public class PlayerListFragment{
             table.name = user.name();
 
             button.add(table).size(h);
-            button.labelWrap("[#" + user.color().toString().toUpperCase() + "]" + user.name()).width(170f).pad(10);
+            // derelict teams get advantage because they're "spectators" i guess
+            button.labelWrap(() -> ("[#" + user.color().toString().toUpperCase() + "]" + user.name() + ((!state.rules.fog || user.team() == player.team() || player.team() == Team.derelict) ? ("\n[gold]" + user.tileX() + ", " + user.tileY() + "[]") : ""))).width(170f).pad(10);
             button.add().grow();
 
             button.image(Icon.admin).visible(() -> user.admin && !(!user.isLocal() && net.server())).padRight(5).get().updateVisibility();
