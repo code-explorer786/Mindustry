@@ -95,8 +95,8 @@ public class MenuFragment{
 
             Fonts.outline.setColor(Color.white);
             Fonts.outline.draw(versionText, fx, fy - logoh/2f - Scl.scl(2f), Align.center);
-            Fonts.outline.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(5f, 1f)));
-            Fonts.outline.draw("code-explorer786 builds", fx, fy - logoh/2 - Scl.scl(4f), Align.center);
+            Fonts.outline.setColor(Tmp.c1.set(Color.white).lerp(Color.scarlet, Mathf.absin(10f, 1f)));
+            Fonts.outline.draw("code-explorer786 builds", fx, fy - logoh/2 - Scl.scl(23f), Align.center);
         }).touchable = Touchable.disabled;
     }
 
