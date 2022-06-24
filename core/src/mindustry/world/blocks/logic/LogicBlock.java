@@ -9,6 +9,7 @@ import arc.struct.Bits;
 import arc.struct.*;
 import arc.util.*;
 import arc.util.io.*;
+import arc.util.pooling.*;
 import mindustry.ai.types.*;
 import mindustry.core.*;
 import mindustry.gen.*;
@@ -201,11 +202,16 @@ public class LogicBlock extends Block{
         public String name;
         public Building lastBuild;
 
-        public LogicLink(int x, int y, String name, boolean valid){
+        public LogicLink(int x, int y, String name, boolean valid, boolean active){
             this.x = x;
             this.y = y;
             this.name = name;
             this.valid = valid;
+            this.active = active;
+        }
+
+        public LogicLink(int x, int y, String name, boolean valid){
+            this(x, y, name, valid, true);
         }
 
         public LogicLink copy(){
@@ -570,6 +576,22 @@ public class LogicBlock extends Block{
             table.button(Icon.pencil, Styles.cleari, () -> {
                 ui.logic.show(code, executor, privileged, code -> configure(compress(code, relativeConnections())));
             }).size(40);
+            table.button(Icon.refresh1, Styles.cleari, () -> {
+                cleanLinks();
+            }).size(40);
+        }
+
+        public void cleanLinks(){
+            links.removeAll(l -> !validLink(world.build(l.x, l.y)));
+
+            ObjectIntMap<String> blocksUsed = Pools.obtain(ObjectIntMap.class, ObjectIntMap::new);
+            blocksUsed.clear();
+            links.filter(l -> validLink(world.tile(l.x,l.y).build));
+            links.replace(l -> {
+                String b = getLinkName(world.tile(l.x, l.y).block());
+                return new LogicLink(l.x, l.y, b + blocksUsed.increment(b, 1, 1), l.valid, l.active);
+            });
+            Pools.free(blocksUsed);
         }
 
         @Override
