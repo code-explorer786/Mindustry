@@ -8,6 +8,7 @@ import mindustry.entities.*;
 import mindustry.entities.bullet.*;
 import mindustry.entities.effect.*;
 import mindustry.entities.part.*;
+import mindustry.entities.part.DrawPart.*;
 import mindustry.entities.pattern.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -23,8 +24,6 @@ import mindustry.world.blocks.heat.*;
 import mindustry.world.blocks.legacy.*;
 import mindustry.world.blocks.liquid.*;
 import mindustry.world.blocks.logic.*;
-import mindustry.world.blocks.payloads.PayloadConveyor;
-import mindustry.world.blocks.payloads.PayloadRouter;
 import mindustry.world.blocks.payloads.*;
 import mindustry.world.blocks.power.*;
 import mindustry.world.blocks.production.*;
@@ -135,7 +134,7 @@ public class Blocks{
     duo, scatter, scorch, hail, arc, wave, lancer, swarmer, salvo, fuse, ripple, cyclone, foreshadow, spectre, meltdown, segment, parallax, tsunami,
 
     //turrets - erekir
-    breach, diffuse, sublimate, titan, disperse, afflict,
+    breach, diffuse, sublimate, titan, disperse, afflict, lustre,
 
     //units
     groundFactory, airFactory, navalFactory,
@@ -1277,7 +1276,7 @@ public class Blocks{
             drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
             size = 2;
             heatOutput = 15f;
-            craftTime = 60f * 12f;
+            craftTime = 60f * 10f;
             consumeItem(Items.phaseFabric);
         }};
 
@@ -3842,9 +3841,7 @@ public class Blocks{
             limitRange();
         }};
 
-        //TODO bad name
         sublimate = new ContinuousLiquidTurret("sublimate"){{
-            //TODO requirements
             requirements(Category.turret, with(Items.tungsten, 150, Items.silicon, 200, Items.oxide, 40, Items.beryllium, 400));
 
             drawer = new DrawTurret("reinforced-"){{
@@ -4083,7 +4080,6 @@ public class Blocks{
             limitRange(-5f);
         }};
 
-        //TODO very WIP
         afflict = new PowerTurret("afflict"){{
             requirements(Category.turret, with(Items.surgeAlloy, 100, Items.silicon, 200, Items.graphite, 250, Items.oxide, 40));
 
@@ -4192,14 +4188,76 @@ public class Blocks{
             recoil = 3f;
             range = 340;
             shootCone = 20f;
-            scaledHealth = 180;
+            scaledHealth = 220;
             rotateSpeed = 1.5f;
             researchCostMultiplier = 0.05f;
 
             limitRange(9f);
         }};
 
-        //TODO 5 more turrets.
+        lustre = new ContinuousTurret("lustre"){{
+            requirements(Category.turret, with(Items.silicon, 250, Items.graphite, 200, Items.oxide, 50, Items.carbide, 90));
+
+            range = 100f;
+
+            shootType = new PointLaserBulletType(){{
+                damage = 150f;
+                buildingDamageMultiplier = 0.3f;
+                hitColor = Color.valueOf("fda981");
+            }};
+
+            drawer = new DrawTurret("reinforced-"){{
+                var heatp = PartProgress.warmup.blend(p -> Mathf.absin(2f, 1f) * p.warmup, 0.2f);
+
+                parts.add(new RegionPart("-blade"){{
+                    progress = PartProgress.warmup;
+                    heatProgress = PartProgress.warmup;
+                    heatColor = Color.valueOf("ff6214");
+                    mirror = true;
+                    under = true;
+                    moveX = 2f;
+                    moveRot = -7f;
+                    moves.add(new PartMove(PartProgress.warmup, 0f, -2f, 3f));
+                }},
+                new RegionPart("-inner"){{
+                    heatProgress = heatp;
+                    progress = PartProgress.warmup;
+                    heatColor = Color.valueOf("ff6214");
+                    mirror = true;
+                    under = false;
+                    moveX = 2f;
+                    moveY = -8f;
+                }},
+                new RegionPart("-mid"){{
+                    heatProgress = heatp;
+                    progress = PartProgress.warmup;
+                    heatColor = Color.valueOf("ff6214");
+                    moveY = -8f;
+                    mirror = false;
+                    under = true;
+                }});
+            }};
+
+            shootWarmupSpeed = 0.08f;
+            shootCone = 360f;
+
+            aimChangeSpeed = 0.9f;
+            rotateSpeed = 0.9f;
+
+            shootY = 0.5f;
+            outlineColor = Pal.darkOutline;
+            size = 4;
+            envEnabled |= Env.space;
+            range = 250f;
+            scaledHealth = 210;
+
+            //TODO is this a good idea to begin with?
+            unitSort = UnitSorts.strongest;
+
+            consumeLiquid(Liquids.nitrogen, 5f / 60f);
+        }};
+
+        //TODO 3 more turrets.
 
         //endregion
         //region units
