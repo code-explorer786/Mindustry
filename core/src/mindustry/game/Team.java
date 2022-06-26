@@ -15,7 +15,7 @@ import static mindustry.Vars.*;
 
 public class Team implements Comparable<Team>{
     public final int id;
-    public final Color color;
+    public Color color;
     public final Color[] palette;
     public final int[] palettei = new int[3];
     public String emoji = "";
@@ -37,13 +37,24 @@ public class Team implements Comparable<Team>{
         green = new Team(4, "green", Color.valueOf("54d67d")),//Color.valueOf("96f58c"), Color.valueOf("54d67d"), Color.valueOf("28785c")),
         blue = new Team(5, "blue", Color.valueOf("6c87fd")); //Color.valueOf("85caf9"), Color.valueOf("6c87fd"), Color.valueOf("3b3392")
 
-    static{
-        Mathf.rand.setSeed(8);
-        //create the whole 256 placeholder teams
-        for(int i = 6; i < all.length; i++){
-            new Team(i, "team#" + i, Color.HSVtoRGB(360f * Mathf.random(), 100f * Mathf.random(0.6f, 1f), 100f * Mathf.random(0.8f, 1f), 1f));
+    public static void initCustomTeams(){
+        if(Core.settings.getBool("randomteamcolors", true)){
+            Mathf.rand.setSeed(8);
+            //create the whole 256 placeholder teams
+            for(int i = 6; i < all.length; i++){
+                new Team(i, "team#" + i, Color.HSVtoRGB(360f * Mathf.random(), 100f * Mathf.random(0.6f, 1f), 100f * Mathf.random(0.8f, 1f), 1f));
+            }
+            Mathf.rand.setSeed(new Rand().nextLong());
+        } else {
+            for(int i = 6; i < all.length; i++){
+                //TODO: change implementation
+                new Team(i, "team#" + i, Color.HSVtoRGB(
+                               360f * ((i - 6f) / (all.length - 6f)),
+                               100f,
+                               100f,
+                               1f));
+            }
         }
-        Mathf.rand.setSeed(new Rand().nextLong());
     }
 
     public static Team get(int id){

@@ -258,6 +258,7 @@ public class Vars implements Loadable{
 
     public static void init(){
         Groups.init();
+        Team.initCustomTeams();
 
         if(loadLocales){
             //load locales
