@@ -96,7 +96,7 @@ public class Rules{
     public float dropZoneRadius = 300f;
     /** Time between waves in ticks. */
     public float waveSpacing = 2 * Time.toMinutes;
-    /** Starting wave spacing; if <0, uses waveSpacing * 2. */
+    /** Starting wave spacing; if <=0, uses waveSpacing * 2. */
     public float initialWaveSpacing = 0f;
     /** Wave after which the player 'wins'. Used in sectors. Use a value <= 0 to disable. */
     public int winWave = 0;
@@ -232,7 +232,7 @@ public class Rules{
         /** If true, this team has infinite unit ammo. */
         public boolean infiniteAmmo;
 
-        /** Enables "RTS" unit AI. TODO wip */
+        /** Enables "RTS" unit AI. */
         public boolean rtsAi;
         /** Minimum size of attack squads. */
         public int rtsMinSquad = 4;
