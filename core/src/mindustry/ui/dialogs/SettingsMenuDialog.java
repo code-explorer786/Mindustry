@@ -132,6 +132,20 @@ public class SettingsMenuDialog extends BaseDialog{
 
             t.row();
 
+            t.button("@settings.clearhints", Icon.trash, style, () -> {
+                ui.showConfirm("@confirm","@settings.clearhints.confirm", () -> {
+                    for(var h : ui.hints.shownHints){
+                        h.reset();
+                    }
+                    ui.hints.hints.add(ui.hints.shownHints);
+                    ui.hints.shownHints.clear();
+
+                    settings.manualSave();
+                });
+            }).marginLeft(4);
+
+            t.row();
+
             t.button("@settings.clearcampaignsaves", Icon.trash, style, () -> {
                 ui.showConfirm("@confirm", "@settings.clearcampaignsaves.confirm", () -> {
                     for(var planet : content.planets()){
