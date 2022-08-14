@@ -135,7 +135,7 @@ public class PlayerListFragment{
             button.add(iconTable).size(h);
             // <id> name
             // x, y (only if clickable)
-            button.labelWrap("[gold]<" + user.id + ">[] " + "[#" + user.color().toString().toUpperCase() + "]" + user.name() + clickable ? ("\n[gold]" + user.tileX() + ", " + user.tileY() + "[]") : "").style(Styles.outlineLabel).width(170f).pad(10);
+            button.labelWrap("[gold]<" + user.id + ">[] [#" + user.color().toString().toUpperCase() + "]" + user.name() + (clickable ? ("\n[gold]" + user.tileX() + ", " + user.tileY() + "[]") : "")).style(Styles.outlineLabel).width(170f).pad(10);
             button.add().grow();
 
             button.background(Tex.underline);

@@ -5622,15 +5622,6 @@ public class Blocks{
             consumePower(0.05f);
         }};
 
-        heatSource = new HeatProducer("heat-source"){{
-            requirements(Category.crafting, BuildVisibility.sandboxOnly, with());
-            drawer = new DrawMulti(new DrawDefault(), new DrawHeatOutput());
-            rotateDraw = false;
-            size = 1;
-            heatOutput = 1000f;
-            regionRotated1 = 1;
-        }};
-
         //endregion
         //region legacy
 

@@ -504,6 +504,7 @@ public class SettingsMenuDialog extends BaseDialog{
 
         graphics.checkPref("skipcoreanimation", false);
         graphics.checkPref("hidedisplays", false);
+        graphics.checkPref("monospacemessageblock", false);
         graphics.checkPref("randomteamcolors", true);
 
         if(!mobile){

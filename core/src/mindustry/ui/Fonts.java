@@ -35,7 +35,7 @@ public class Fonts{
     private static TextureRegion[] iconTable;
     private static int lastCid;
 
-    public static Font def, outline, icon, iconLarge, tech;
+    public static Font def, outline, icon, iconLarge, tech, hack;
 
     public static TextureRegion logicIcon(int id){
         return iconTable[id];
@@ -202,6 +202,8 @@ public class Fonts{
             Fonts.tech = f;
             Fonts.tech.getData().down *= 1.5f;
         };
+        
+        Core.assets.load("hack", Font.class, new FreeTypeFontLoaderParameter("fonts/hack.ttf", param)).loaded = t -> Fonts.hack = t;
     }
 
     /** Merges the UI and font atlas together for better performance. */

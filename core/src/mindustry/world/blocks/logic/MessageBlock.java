@@ -62,7 +62,7 @@ public class MessageBlock extends Block{
         public void drawSelect(){
             if(renderer.pixelator.enabled()) return;
 
-            Font font = Fonts.outline;
+            Font font = Core.settings.getBool("monospacemessageblock", false) ? Fonts.hack : Fonts.outline;
             GlyphLayout l = Pools.obtain(GlyphLayout.class, GlyphLayout::new);
             boolean ints = font.usesIntegerPositions();
             font.getData().setScale(1 / 4f / Scl.scl(1f));
@@ -101,6 +101,11 @@ public class MessageBlock extends Block{
                     BaseDialog dialog = new BaseDialog("@editmessage");
                     dialog.setFillParent(false);
                     TextArea a = dialog.cont.add(new TextArea(message.toString().replace("\r", "\n"))).size(380f, 160f).get();
+                    if(Core.settings.getBool("monospacemessageblock", false)){
+                        var style = a.getStyle();
+                        style.font = Fonts.hack;
+                        a.setStyle(style);
+                    }
                     a.setFilter((textField, c) -> {
                         if(c == '\n'){
                             int count = 0;
