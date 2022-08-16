@@ -1,5 +1,5 @@
 ### 16-08-2022
-NEWS.md updates are now uploaded to Discord. Attempts: 2
+NEWS.md updates are now uploaded to Discord. Attempts: 3
 
 ### 14-08-2022
 This file is created.

@@ -10,7 +10,7 @@ jobs:
     - uses: actions/checkout@v2
     - name: Upload news to Discord
       run: |
-          if [ ! -z ${{ secrets.NEWS_WEBHOOK_URL }}; then
+          if [ ! -z ${{ secrets.NEWS_WEBHOOK_URL }} ]; then
             NEWS_CONTENT=$( git diff ${{ github.event.before }} NEWS.md )
             if [ ! -z NEWS_CONTENT ]; then
                 NEWS_JSON=$( echo '{}' | jq -c --arg news "$NEWS_CONTENT" \
