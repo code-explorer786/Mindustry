@@ -8,6 +8,17 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
+    - name: Upload news to Discord
+      if: ${{ secrets.NEWS_WEBHOOK_URL != "" }}
+      run: |
+          NEWS_CONTENT=$( git diff ${{ github.event.before }} NEWS.md )
+          if [ ! -z NEWS_CONTENT ]; then
+            NEWS_JSON=$( echo '{}' | jq -c --arg news "$NEWS_CONTENT" \
+                                           --arg commit "${{ github.event.after }}" \
+                                           --arg date "$(date)" \
+                                           '{ content : ($commit + " on " + $date + "\n\n```patch" + $news + "```") }' )
+            curl -H "Content-Type: application/json" -d "$NEWS_JSON" "${{ secrets.NEWS_WEBHOOK_URL }}"
+          fi
     - name: Trigger BE build
       if: ${{ github.repository == 'code-explorer786/Mindustry' }}
       run: |
