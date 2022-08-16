@@ -7,7 +7,10 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+          # Please bump this number.
+          fetch-depth : 20
     - name: Upload news to Discord
       run: |
           if [ ! -z "${{ secrets.NEWS_WEBHOOK_URL }}" ]; then
