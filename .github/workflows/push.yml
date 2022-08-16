@@ -9,17 +9,17 @@ jobs:
     steps:
     - uses: actions/checkout@v3
       with:
-          # Please bump this number.
+          # Please bump this number, and replace HEAD~20.
           fetch-depth : 20
     - name: Upload news to Discord
       run: |
           if [ ! -z "${{ secrets.NEWS_WEBHOOK_URL }}" ]; then
-            NEWS_CONTENT=$( git diff ${{ github.event.before }} NEWS.md )
+            NEWS_CONTENT=$( git diff ${{ github.event.before }} NEWS.md ) || NEWS_CONTENT=$( git diff HEAD~20 NEWS.md )
             if [ ! -z "$NEWS_CONTENT" ]; then
                 NEWS_JSON=$( echo '{}' | jq -c --arg news "$NEWS_CONTENT" \
                                                --arg commit "${{ github.event.after }}" \
                                                --arg date "$(date)" \
-                                               '{ content : ($commit + " on " + $date + "\n\n```patch" + $news + "```") }' )
+                                               '{ content : ("`" + $commit + "` on `" + $date + "`\n\n```patch\n" + $news + "```") }' )
                 curl -H "Content-Type: application/json" -d "$NEWS_JSON" "${{ secrets.NEWS_WEBHOOK_URL }}"
             fi
           fi
