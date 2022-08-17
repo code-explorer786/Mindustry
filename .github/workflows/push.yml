@@ -11,17 +11,30 @@ jobs:
       with:
           # Please bump this number, and replace HEAD~20.
           fetch-depth : 20
-    - name: Upload news to Discord
+    - name: Upload news to Discord and Matrix
       run: |
-          if [ ! -z "${{ secrets.NEWS_WEBHOOK_URL }}" ]; then
-            NEWS_CONTENT=$( git diff ${{ github.event.before }} NEWS.md ) || NEWS_CONTENT=$( git diff HEAD~20 NEWS.md )
-            if [ ! -z "$NEWS_CONTENT" ]; then
+          NEWS_CONTENT=$( git diff ${{ github.event.before }} NEWS.md ) || NEWS_CONTENT=$( git diff HEAD~20 NEWS.md )
+          if [ ! -z "$NEWS_CONTENT" ]; then
+              if [ ! -z "${{ secrets.NEWS_WEBHOOK_URL  }}" ]; then
                 NEWS_JSON=$( echo '{}' | jq -c --arg news "$NEWS_CONTENT" \
-                                               --arg commit "${{ github.event.after }}" \
-                                               --arg date "$(date)" \
-                                               '{ content : ("`" + $commit + "` on `" + $date + "`\n\n```patch\n" + $news + "```") }' )
-                curl -H "Content-Type: application/json" -d "$NEWS_JSON" "${{ secrets.NEWS_WEBHOOK_URL }}"
-            fi
+                                                 --arg commit "${{ github.event.after }}" \
+                                                 --arg date "$(date)" \
+                                                 '{ content : ("`" + $commit + "` on `" + $date + "`\n\n```patch\n" + $news + "```") }' )
+                url --json "$NEWS_JSON" "${{ secrets.NEWS_WEBHOOK_URL }}"
+              fi
+
+              # Thanks DeltaNedas!
+              if [ ! -z "${{ secrets.MATRIX_NEWS_WEBHOOK_URL  }}" ]; then
+                NEWS_JSON=$( echo '{}' | jq -c --arg news "$NEWS_CONTENT" \
+                                                 --arg commit "${{ github.event.after }}" \
+                                                 --arg date "$(date)" \
+                                                 '{' \
+                                                     'formatted_body: ("<p><code>" + $commit + "</code> on <code>" + $date + "</code></p>\n\n<pre><code>patch\n" + $news + "</code></pre>"),' \
+                                                    'body: ("`" + $commit + "` on `" + $date + "`\n\n```patch\n" + $news + "```"),' \
+                                                    'msgtype: "m.notice","format":"org.matrix.custom.html"' \
+                                                 '}' )
+                url --json "$NEWS_JSON" "${{ secrets.MATRIX_NEWS_WEBHOOK_URL }}"
+              fi
           fi
     - name: Trigger BE build
       if: ${{ github.repository == 'code-explorer786/Mindustry' }}
