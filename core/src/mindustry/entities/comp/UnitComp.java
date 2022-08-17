@@ -31,7 +31,7 @@ import static mindustry.Vars.*;
 import static mindustry.logic.GlobalVars.*;
 
 @Component(base = true)
-abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Senseable, Ranged, Minerc, Builderc{
+abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, Itemsc, Rotc, Unitc, Weaponsc, Drawc, Boundedc, Syncc, Shieldc, Displayable, Senseable, SetProppable, Ranged, Minerc, Builderc{
 
     @Import boolean hovering, dead, disarmed;
     @Import float x, y, rotation, elevation, maxHealth, drag, armor, hitSize, health, ammo, dragMultiplier;
@@ -239,6 +239,40 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
     public double sense(Content content){
         if(content == stack().item) return stack().amount;
         return Float.NaN;
+    }
+
+    @Override
+    public void setProp(LProperty property, double value){
+        switch(property){
+            case health -> health((float)Mathf.clamp(value, 0, maxHealth));
+            case team -> team(Team.get((int)value));
+            case flag -> flag(value);
+        }
+    }
+
+    @Override
+    public void setProp(Content content, double value){
+        if(content instanceof Item i) stack(new ItemStack(i, (int)Mathf.clamp(value, 0, itemCapacity())));
+    }
+
+    @Override
+    public void setPropObject(LProperty property, Object value){
+        switch(property){
+            case payload -> {
+                if(((Object)this) instanceof Payloadc pay){
+                    if(value instanceof Block b){
+                        Building build = b.newBuilding().create(b, team());
+                        if(pay.canPickup(build)) pay.addPayload(new BuildPayload(build));
+                    }else if(value instanceof UnitType ut){
+                        Unit unit = ut.create(team());
+                        if(pay.canPickup(unit)) pay.addPayload(new UnitPayload(unit));
+                    }else pay.dropLastPayload();
+                }
+            }
+            case team -> {
+                if(value instanceof Team t) team(t);
+            }
+        }
     }
 
     @Override
