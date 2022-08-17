@@ -20,7 +20,7 @@ jobs:
                                                  --arg commit "${{ github.event.after }}" \
                                                  --arg date "$(date)" \
                                                  '{ content : ("`" + $commit + "` on `" + $date + "`\n\n```patch\n" + $news + "```") }' )
-                url --json "$NEWS_JSON" "${{ secrets.NEWS_WEBHOOK_URL }}"
+                curl --json "$NEWS_JSON" "${{ secrets.NEWS_WEBHOOK_URL }}"
               fi
 
               # Thanks DeltaNedas!
@@ -33,7 +33,7 @@ jobs:
                                                     'body: ("`" + $commit + "` on `" + $date + "`\n\n```patch\n" + $news + "```"),' \
                                                     'msgtype: "m.notice","format":"org.matrix.custom.html"' \
                                                  '}' )
-                url --json "$NEWS_JSON" "${{ secrets.MATRIX_NEWS_WEBHOOK_URL }}"
+                curl --json "$NEWS_JSON" "${{ secrets.MATRIX_NEWS_WEBHOOK_URL }}"
               fi
           fi
     - name: Trigger BE build
