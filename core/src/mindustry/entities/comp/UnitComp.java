@@ -63,6 +63,12 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
     }
 
+    public void updateBoosting(boolean boost){
+        if(!type.canBoost) return;
+
+        elevation = Mathf.approachDelta(elevation, type.canBoost ? Mathf.num(boost || onSolid() || (isFlying() && !canLand())) : 0f, type.riseSpeed);
+    }
+
     /** Move based on preferred unit movement type. */
     public void movePref(Vec2 movement){
         if(type.omniMovement){
@@ -97,6 +103,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         aim(x, y);
         lookAt(x, y);
     }
+
+    public boolean isPathImpassable(int tileX, int tileY){
+        return !type.flying && type.pathCost.getCost(team.id, pathfinder.get(tileX, tileY)) == -1;
+    }
+
 
     /** @return approx. square size of the physical hitbox for physics */
     public float physicSize(){
@@ -133,6 +144,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
             return vel().angle();
         }
         return rotation;
+    }
+
+    @Override
+    public boolean displayable(){
+        return type.hoverable;
     }
 
     @Override
@@ -471,6 +487,15 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         healTime -= Time.delta / 20f;
         wasHealed = false;
 
+        //die on captured sectors immediately
+        if(team.isOnlyAI() && state.isCampaign() && state.getSector().isCaptured()){
+            kill();
+        }
+
+        if(!headless && type.loopSound != Sounds.none){
+            control.sound.loop(type.loopSound, this, type.loopSoundVolume);
+        }
+
         //check if environment is unsupported
         if(!type.supportsEnv(state.rules.env) && !dead){
             Call.unitEnvDeath(self());
@@ -504,7 +529,7 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
         drag = type.drag * (isGrounded() ? (floorOn().dragMultiplier) : 1f) * dragMultiplier * state.rules.dragMultiplier;
 
         //apply knockback based on spawns
-        if(team != state.rules.waveTeam && state.hasSpawns() && (!net.client() || isLocal())){
+        if(team != state.rules.waveTeam && state.hasSpawns() && (!net.client() || isLocal()) && hittable()){
             float relativeSize = state.rules.dropZoneRadius + hitSize/2f + 1f;
             for(Tile spawn : spawner.getSpawns()){
                 if(within(spawn.worldx(), spawn.worldy(), relativeSize)){
@@ -701,5 +726,11 @@ abstract class UnitComp implements Healthc, Physicsc, Hitboxc, Statusc, Teamc, I
 
         //deaths are synced; this calls killed()
         Call.unitDeath(id);
+    }
+
+    @Override
+    @Replace
+    public String toString(){
+        return "Unit#" + id() + ":" + type;
     }
 }

@@ -1,5 +1,6 @@
 package mindustry.world.blocks.payloads;
 
+import arc.*;
 import arc.graphics.g2d.*;
 import arc.math.*;
 import arc.math.geom.*;
@@ -9,6 +10,7 @@ import arc.util.io.*;
 import mindustry.*;
 import mindustry.ctype.*;
 import mindustry.entities.units.*;
+import mindustry.game.EventType.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -29,6 +31,7 @@ public class PayloadSource extends PayloadBlock{
         hasPower = false;
         rotate = true;
         configurable = true;
+        selectionRows = selectionColumns = 8;
         //make sure to display large units.
         clipSize = 120;
         noUpdateDisabled = true;
@@ -75,7 +78,7 @@ public class PayloadSource extends PayloadBlock{
     }
 
     public boolean canProduce(Block b){
-        return b.isVisible() && b.size < size && !(b instanceof CoreBlock) && !state.rules.bannedBlocks.contains(b) && b.environmentBuildable();
+        return b.isVisible() && b.size < size && !(b instanceof CoreBlock) && !state.rules.isBanned(b) && b.environmentBuildable();
     }
 
     public boolean canProduce(UnitType t){
@@ -103,7 +106,7 @@ public class PayloadSource extends PayloadBlock{
             ItemSelection.buildTable(PayloadSource.this, table,
                 content.blocks().select(PayloadSource.this::canProduce).<UnlockableContent>as()
                 .add(content.units().select(PayloadSource.this::canProduce).as()),
-            () -> (UnlockableContent)config(), this::configure);
+            () -> (UnlockableContent)config(), this::configure, selectionRows, selectionColumns);
         }
 
         @Override
@@ -128,6 +131,8 @@ public class PayloadSource extends PayloadBlock{
                     if(commandPos != null && p.isCommandable()){
                         p.command().commandPosition(commandPos);
                     }
+
+                    Events.fire(new UnitCreateEvent(p, this));
                 }else if(block != null){
                     payload = new BuildPayload(block, team);
                 }

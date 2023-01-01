@@ -83,6 +83,11 @@ public class LogicBlock extends Block{
         });
     }
 
+    @Override
+    public boolean checkForceDark(Tile tile){
+        return !accessible();
+    }
+
     public boolean accessible(){
         return !privileged || state.rules.editor || state.rules.accessibleWorldLogic || state.playtestingMap != null;
     }

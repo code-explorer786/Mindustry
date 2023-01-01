@@ -54,6 +54,13 @@ public class LaserTurret extends PowerTurret{
         }
 
         @Override
+        public void placed(){
+            super.placed();
+
+            reloadCounter = reload;
+        }
+
+        @Override
         public void updateTile(){
             super.updateTile();
 
@@ -132,6 +139,11 @@ public class LaserTurret extends PowerTurret{
             if(bullet != null){
                 bullets.add(new BulletEntry(bullet, offsetX, offsetY, angleOffset, shootDuration));
             }
+        }
+
+        @Override
+        public float activeSoundVolume(){
+            return 1f;
         }
 
         @Override
