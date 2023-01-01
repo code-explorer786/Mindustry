@@ -97,6 +97,11 @@ public class LogicDialog extends BaseDialog{
                         dialog.hide();
                         Core.app.setClipboardText(canvas.save());
                     }).marginLeft(12f);
+					t.row();
+					t.button("@logic.copy.labels", Icon.copy, style, () -> {
+                        dialog.hide();
+                        Core.app.setClipboardText(canvas.saveLabels());
+                    }).marginLeft(12f);
                     t.row();
                     t.button("@schematic.copy.import", Icon.download, style, () -> {
                         dialog.hide();

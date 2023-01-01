@@ -144,6 +144,13 @@ public class LCanvas extends Table{
 
         return LAssembler.write(st);
     }
+	
+	public String saveLabels(){
+		Seq<LStatement> st = statements.getChildren().<StatementElem>as().map(s -> s.st);
+		st.each(LStatement::saveUI);
+
+		return LAssembler.writeLabels(st);
+	}
 
     public void load(String asm){
         jumps.clear();

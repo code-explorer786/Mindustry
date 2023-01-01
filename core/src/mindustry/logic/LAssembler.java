@@ -8,6 +8,7 @@ import arc.math.*;
 import mindustry.*;
 import mindustry.content.*;
 import mindustry.logic.LExecutor.*;
+import mindustry.logic.LStatements.*;
 
 /** "Compiles" a sequence of statements into instructions. */
 public class LAssembler{
@@ -101,6 +102,43 @@ public class LAssembler{
 
         return out.toString();
     }
+
+	public static String writeLabels(Seq<LStatement> statements){
+		StringBuilder out = new StringBuilder();
+		IntSeq jumps = new IntSeq();
+		
+		// scan for every jump
+		for(LStatement s : statements){
+			if(s instanceof JumpStatement j) jumps.addUnique(j.destIndex);
+		}
+		jumps.sort();
+
+		// build
+		int i = 0;
+		int jumpIndex = 0;
+		for(LStatement s : statements){
+			if(jumps.contains(i++)){
+				out.append("label_");
+				out.append(jumpIndex++);
+				out.append(":\n");
+			}
+			out.append("    ");
+			if(s instanceof JumpStatement j){
+				out.append("jump label_");
+				out.append(jumps.indexOf(j.destIndex));
+				out.append(" ");
+				out.append(j.op.name());
+				out.append(" ");
+				out.append(j.value);
+				out.append(" ");
+				out.append(j.compare);
+			} else {
+				s.write(out);
+			}
+			out.append("\n");
+		}
+		return out.toString();
+	}
 
     /** Parses a sequence of statements from a string. */
     public static Seq<LStatement> read(String text, boolean privileged){
