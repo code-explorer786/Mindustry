@@ -3,7 +3,6 @@ package mindustry.world.blocks.distribution;
 import arc.math.*;
 import arc.util.*;
 import mindustry.content.*;
-import mindustry.ctype.*;
 import mindustry.gen.*;
 import mindustry.type.*;
 import mindustry.world.*;
@@ -77,12 +76,6 @@ public class Router extends Block{
         @Override
         public boolean acceptItem(Building source, Item item){
             return team == source.team && lastItem == null && items.total() == 0;
-        }
-
-        @Override
-        public void setProp(Content content, double value){
-            if(content instanceof Item && value == 0) lastItem = null;
-            super.setProp(content, value);
         }
 
         @Override
