@@ -51,7 +51,7 @@ public class UI implements ApplicationListener, Loadable{
     public AboutDialog about;
     public GameOverDialog restart;
     public CustomGameDialog custom;
-    public MapsDialog maps;
+    public EditorMapsDialog maps;
     public LoadDialog load;
     public DiscordDialog discord;
     public JoinDialog join;
@@ -75,12 +75,22 @@ public class UI implements ApplicationListener, Loadable{
     public FullTextDialog fullText;
     public CampaignCompleteDialog campaignComplete;
 
+    public IntMap<Dialog> followUpMenus;
+
     public Cursor drillCursor, unloadCursor, targetCursor;
 
     private @Nullable Element lastAnnouncement;
 
     public UI(){
         Fonts.loadFonts();
+    }
+
+    public static void loadColors(){
+        Colors.put("accent", Pal.accent);
+        Colors.put("unlaunched", Color.valueOf("8982ed"));
+        Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
+        Colors.put("stat", Pal.stat);
+        Colors.put("negstat", Pal.negativeStat);
     }
 
     @Override
@@ -90,6 +100,8 @@ public class UI implements ApplicationListener, Loadable{
 
     @Override
     public void loadSync(){
+        loadColors();
+
         Fonts.outline.getData().markupEnabled = true;
         Fonts.def.getData().markupEnabled = true;
         Fonts.def.setOwnsTexture(false);
@@ -122,12 +134,6 @@ public class UI implements ApplicationListener, Loadable{
         });
 
         ClickListener.clicked = () -> Sounds.press.play();
-
-        Colors.put("accent", Pal.accent);
-        Colors.put("unlaunched", Color.valueOf("8982ed"));
-        Colors.put("highlight", Pal.accent.cpy().lerp(Color.white, 0.3f));
-        Colors.put("stat", Pal.stat);
-        Colors.put("negstat", Pal.negativeStat);
 
         drillCursor = Core.graphics.newCursor("drill", Fonts.cursorScale());
         unloadCursor = Core.graphics.newCursor("unload", Fonts.cursorScale());
@@ -193,7 +199,7 @@ public class UI implements ApplicationListener, Loadable{
         bans = new BansDialog();
         admins = new AdminsDialog();
         traces = new TraceDialog();
-        maps = new MapsDialog();
+        maps = new EditorMapsDialog();
         content = new ContentInfoDialog();
         planet = new PlanetDialog();
         research = new ResearchDialog();
@@ -202,6 +208,7 @@ public class UI implements ApplicationListener, Loadable{
         logic = new LogicDialog();
         fullText = new FullTextDialog();
         campaignComplete = new CampaignCompleteDialog();
+        followUpMenus = new IntMap<>();
 
         Group group = Core.scene.root;
 
@@ -276,7 +283,8 @@ public class UI implements ApplicationListener, Loadable{
                 cont.margin(30).add(text).padRight(6f);
                 TextFieldFilter filter = numbers ? TextFieldFilter.digitsOnly : (f, c) -> true;
                 TextField field = cont.field(def, t -> {}).size(330f, 50f).get();
-                field.setFilter((f, c) -> field.getText().length() < textLength && filter.acceptChar(f, c));
+                field.setMaxLength(textLength);
+                field.setFilter(filter);
                 buttons.defaults().size(120, 54).pad(4);
                 buttons.button("@cancel", () -> {
                     closed.run();
@@ -591,9 +599,9 @@ public class UI implements ApplicationListener, Loadable{
         dialog.show();
     }
 
-    /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
-    public void showMenu(String title, String message, String[][] options, Intc callback){
-        new Dialog(title){{
+    // TODO REPLACE INTEGER WITH arc.fun.IntCons(int, T) or something like that.
+    public Dialog newMenuDialog(String title, String message, String[][] options, Cons2<Integer, Dialog> buttonListener){
+        return new Dialog(title){{
             setFillParent(true);
             removeChild(titleTable);
             cont.add(titleTable).width(400f);
@@ -617,16 +625,47 @@ public class UI implements ApplicationListener, Loadable{
 
                         String optionName = optionsRow[i];
                         int finalOption = option;
-                        buttonRow.button(optionName, () -> {
-                            callback.get(finalOption);
-                            hide();
-                        }).size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
+                        buttonRow.button(optionName, () -> buttonListener.get(finalOption, this))
+                                .size(i == optionsRow.length - 1 ? lastWidth : width, 50).pad(4);
                         option++;
                     }
                 }
             }).growX();
-            closeOnBack(() -> callback.get(-1));
-        }}.show();
+        }};
+    }
+
+    /** Shows a menu that fires a callback when an option is selected. If nothing is selected, -1 is returned. */
+    public void showMenu(String title, String message, String[][] options, Intc callback){
+        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> {
+            callback.get(option);
+            myself.hide();
+        });
+        dialog.closeOnBack(() -> callback.get(-1));
+        dialog.show();
+    }
+
+    /** Shows a menu that hides when another followUp-menu is shown or when nothing is selected.
+     * @see UI#showMenu(String, String, String[][], Intc) */
+    public void showFollowUpMenu(int menuId, String title, String message, String[][] options, Intc callback) {
+        Dialog dialog = newMenuDialog(title, message, options, (option, myself) -> callback.get(option));
+        dialog.closeOnBack(() -> {
+            followUpMenus.remove(menuId);
+            callback.get(-1);
+        });
+
+        Dialog oldDialog = followUpMenus.remove(menuId);
+        if(oldDialog != null){
+            dialog.show(Core.scene, null);
+            oldDialog.hide(null);
+        }else{
+            dialog.show();
+        }
+        followUpMenus.put(menuId, dialog);
+    }
+
+    public void hideFollowUpMenu(int menuId) {
+        if(!followUpMenus.containsKey(menuId)) return;
+        followUpMenus.remove(menuId).hide();
     }
 
     /** Formats time with hours:minutes:seconds. */
